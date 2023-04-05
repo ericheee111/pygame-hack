@@ -489,6 +489,10 @@ class Restart:
             SCREEN_WIDTH//2-self.game_over_img.get_width()//2,
             SCREEN_HEIGHT//4 - 100
         )
+        self.game_win_pos = (
+            SCREEN_WIDTH//2-self.game_over_win_img.get_width()//2,
+            SCREEN_HEIGHT//4 - 100
+        )
         self.reset_pos = (
             SCREEN_WIDTH//2-self.reset_img.get_width()//2,
             SCREEN_HEIGHT//2 + 50
@@ -505,7 +509,7 @@ class Restart:
         text2 = self.font.render("Press Enter to Restart Game", True, (0, 0, 0))
         text_rect2 = text2.get_rect()
         if is_win:
-            SCREEN.blit(self.game_over_win_img, self.game_over_pos)
+            SCREEN.blit(self.game_over_win_img, self.game_win_pos)
             SCREEN.blit(self.reset_win_img, self.reset_win_pos)
             text_rect1.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100)
             text_rect2.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150)
@@ -585,9 +589,6 @@ class ShootingMain:
                     if event.key == pygame.K_ESCAPE:
                         pygame.mixer.music.stop()
                         return
-                    if event.key == pygame.K_BACKSPACE:
-                        self.game_over = 2
-                        self.game_over_time = time.time()
                 if event.type == pygame.KEYDOWN:
                     if self.game_over and event.key==pygame.K_RETURN:
                         self.start()
