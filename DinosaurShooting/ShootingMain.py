@@ -55,8 +55,8 @@ BOOM_IMG = [
 GUN_ITEM_IMG = transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/Gun/Gun_item.png")), width=50)
 HELMET_ITEM_IMG = transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/head/Helmet_item.png")), width=50)
 HEALTH_ITEM_IMG = transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Health_item.png")), width=50)
-GAME_OVER_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/GameOver.png"))
-GAME_OVER_WIN_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Win.png"))
+GAME_OVER_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/wasted.png"))
+GAME_OVER_WIN_IMG = transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Win.png")), width=400)
 RESET_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Reset.png"))
 RESET_WIN_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Reset_win.png"))
 GROUND_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Ground.png"))
@@ -148,7 +148,7 @@ class Explosion:
         self.max_step = 20
 
     def draw(self):
-        img = BOOM_IMG[min(self.max_step-1, self.step)//(self.max_step//2)]
+        img = BOOM_IMG[min(self.max_step - 1, self.step)//(self.max_step//2)]
         rect = img.get_rect()
         rect.centerx = self.obj.rect.centerx
         rect.centery = self.obj.rect.centery
@@ -186,12 +186,12 @@ class Dinosaur:
             SCREEN.blit(self.helmet_img, self.helmet_rect)
         SCREEN.blit(self.gun_img, self.gun_rect)
 
-        # 画血条
+        # draw health bar
         pygame.draw.rect(SCREEN, (0, 0, 0), (49, 19, 102, 22), 1)
         pygame.draw.rect(SCREEN, (0, 255, 0), (50, 20, self.health, 20), 0)
 
     def update_health(self, state):
-        # state: 0 加血, 1 被子弹击中, 2 被敌人撞到
+        # state: heal = 0, shot = 1, hit = 2
         if state==0:
             self.health += 20
         elif state==1:
@@ -388,17 +388,17 @@ class Cactus:
             speed_y = -speed_y
         return [Bullet(bullet_idx=3, centerx=self.rect.centerx, centery=self.rect.centery, speed_x=speed_x, speed_y=speed_y)]
 
-    def shoot(self, dino):
+    def shoot(self, dinosaur):
         if (time.time() - self.last_shoot_time) > (random.random()+0.1):
             self.last_shoot_time = time.time()
-            return self.get_bullet(dino)
+            return self.get_bullet(dinosaur)
         return []
 
 class Wyvern:
     def __init__(self):
-        self.health = 100
+        self.health = 60
         self.speed = 2
-        self.bullet_speed = 10
+        self.bullet_speed = 8
         self.direct_x = 1
         self.direct_y = 1
         self.last_shoot_time = 0
@@ -412,8 +412,8 @@ class Wyvern:
 
     def update_health(self, state):
         # state: shot = 0 (health - 10), hit = 1 (die);
-        if state==0:
-            self.health -= 10
+        if state == 0:
+            self.health -= 20
         else:
             self.health = 0
 
@@ -467,13 +467,13 @@ class Wyvern:
         return [Bullet(bullet_idx=2, centerx=self.rect.centerx, centery=self.rect.centery, speed_x=speed_x, speed_y=speed_y)]
 
     def shoot(self, dinosaur):
-        if self.shoot_times == 6:
-            if (time.time() - self.last_shoot_time) > (0.5 + random.random()):
+        if self.shoot_times == 3:
+            if (time.time() - self.last_shoot_time) > (0.8 + random.random()):
                 self.shoot_times = 1
                 self.last_shoot_time = time.time()
                 return self.get_bullet(dinosaur)
         else:
-            if (time.time() - self.last_shoot_time) > 0.2:
+            if (time.time() - self.last_shoot_time) > 0.6:
                 self.shoot_times += 1
                 self.last_shoot_time = time.time()
                 return self.get_bullet(dinosaur)
@@ -487,31 +487,36 @@ class Restart:
         self.reset_win_img = RESET_WIN_IMG
         self.game_over_pos = (
             SCREEN_WIDTH//2-self.game_over_img.get_width()//2,
-            SCREEN_HEIGHT//4
+            SCREEN_HEIGHT//4 - 100
         )
         self.reset_pos = (
             SCREEN_WIDTH//2-self.reset_img.get_width()//2,
             SCREEN_HEIGHT//2 + 50
         )
+        self.reset_win_pos = (
+            SCREEN_WIDTH//2-self.reset_img.get_width()//2,
+            SCREEN_HEIGHT//2 + 200
+        )
         self.font = pygame.font.SysFont("SimHei", 30)
 
     def draw(self, cost_time, is_win):
+        text1 = self.font.render("Game Duration: %.2f s" % cost_time, True, (0, 0, 0))
+        text_rect1 = text1.get_rect()
+        text2 = self.font.render("Press Enter to Restart Game", True, (0, 0, 0))
+        text_rect2 = text2.get_rect()
         if is_win:
             SCREEN.blit(self.game_over_win_img, self.game_over_pos)
-            SCREEN.blit(self.reset_win_img, self.reset_pos)
+            SCREEN.blit(self.reset_win_img, self.reset_win_pos)
+            text_rect1.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100)
+            text_rect2.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150)
         else:
             SCREEN.blit(self.game_over_img, self.game_over_pos)
             SCREEN.blit(self.reset_img, self.reset_pos)
+            text_rect1.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 + 70)
+            text_rect2.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 3 + 120)
 
-        text = self.font.render("Game Duration: %.2f s" % cost_time, True, (0, 0, 0))
-        text_rect = text.get_rect()
-        text_rect.center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//3+50)
-        SCREEN.blit(text, text_rect)
-
-        text = self.font.render("Press Enter to Restart Game", True, (0, 0, 0))
-        text_rect = text.get_rect()
-        text_rect.center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//3+100)
-        SCREEN.blit(text, text_rect)
+        SCREEN.blit(text1, text_rect1)
+        SCREEN.blit(text2, text_rect2)
 
 
 class ShootingMain:
@@ -540,11 +545,11 @@ class ShootingMain:
         self.boom_list = []
         self.enemy_list = []
         self.enemy_config = [
-            {"bird": 3, "cactus": 0, "boss": 1},
-            {"bird": 6, "cactus": 4, "boss": 0},
-            {"bird": 5, "cactus": 3, "boss": 0},
-            {"bird": 4, "cactus": 2, "boss": 0},
-            {"bird": 3, "cactus": 1, "boss": 0}
+            {"wyvern": 3, "cactus": 0, "boss": 1},
+            {"wyvern": 6, "cactus": 4, "boss": 0},
+            {"wyvern": 5, "cactus": 3, "boss": 0},
+            {"wyvern": 4, "cactus": 2, "boss": 0},
+            {"wyvern": 3, "cactus": 1, "boss": 0}
         ]
         self.last_kill_all_enemy_time = None
         self.bullet_list = []
@@ -580,6 +585,9 @@ class ShootingMain:
                     if event.key == pygame.K_ESCAPE:
                         pygame.mixer.music.stop()
                         return
+                    if event.key == pygame.K_BACKSPACE:
+                        self.game_over = 2
+                        self.game_over_time = time.time()
                 if event.type == pygame.KEYDOWN:
                     if self.game_over and event.key==pygame.K_RETURN:
                         self.start()
@@ -619,7 +627,7 @@ class ShootingMain:
                     self.last_kill_all_enemy_time = time.time()
                 elif self.last_kill_all_enemy_time is not None and (time.time()-self.last_kill_all_enemy_time) > 5:
                     enemy_config = self.enemy_config.pop()
-                    for _ in range(enemy_config["bird"]):
+                    for _ in range(enemy_config["wyvern"]):
                         self.enemy_list.append(Wyvern())
                     for _ in range(enemy_config["cactus"]):
                         self.enemy_list.append(Cactus())
