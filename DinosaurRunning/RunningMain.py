@@ -3,6 +3,7 @@ import random
 import sys
 from setting import SCREEN_WIDTH, SCREEN_HEIGHT, MAIN_DIR, SCREEN, CLOCK
 import os
+from tools import transform_image_constant, obj_is_mask
 
 GAME_SPEED = 20
 
@@ -30,7 +31,7 @@ WYVERN_IMG = [
     pygame.image.load(os.path.join(MAIN_DIR, "Image/Wyvern/wyvern1.png")),
     pygame.image.load(os.path.join(MAIN_DIR, "Image/Wyvern/wyvern2.png"))
 ]
-GAME_OVER_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/wasted.png"))
+GAME_OVER_IMG = transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/over.png")), width=350)
 RESET_IMG = pygame.image.load(os.path.join(MAIN_DIR, "Image/Other/Reset.png"))
 JUMP_MUSIC = pygame.mixer.Sound(os.path.join(MAIN_DIR, "Music/big_jump.ogg"))
 MAIN_THEME_MUSIC = os.path.join(MAIN_DIR, "Music/main_theme.ogg")
@@ -182,7 +183,7 @@ class Restart:
         self.textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT * 0.8)
         self.game_over_pos = (
             SCREEN_WIDTH//2-self.game_over_img.get_width()//2,
-            SCREEN_HEIGHT//4
+            SCREEN_HEIGHT//4 - 150
         )
         self.reset_pos = (
             SCREEN_WIDTH//2 - self.reset_img.get_width()//2,
