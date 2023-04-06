@@ -42,10 +42,10 @@ WYVERN_IMG = [
     pygame.image.load(os.path.join(MAIN_DIR, "Image/Wyvern/wyvern2.png"))
 ]
 BOSS_IMG = [
-    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/Chiken1.png")),
-    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/Chiken2.png")),
-    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/Chiken3.png")),
-    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/Chiken4.png"))
+    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/boss1.png")),
+    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/boss1.png")),
+    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/boss.png")),
+    pygame.image.load(os.path.join(MAIN_DIR, "Image/Boss/boss.png"))
 ]
 BOOM_IMG = [
     transform_image_constant(pygame.image.load(os.path.join(MAIN_DIR, "Image/explosion/ex1.png")), width=100),
@@ -198,9 +198,9 @@ class Dinosaur:
             if self.helmet_idx >= 0:
                 self.helmet_idx -= 1
             else:
-                self.health -= 10
+                self.health -= 1
         else:
-            self.health -= 50
+            self.health -= 5
         self.health = min(max(0, self.health), 100)
 
     def update_gun(self):
