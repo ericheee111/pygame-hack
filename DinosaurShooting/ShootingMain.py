@@ -198,9 +198,9 @@ class Dinosaur:
             if self.helmet_idx >= 0:
                 self.helmet_idx -= 1
             else:
-                self.health -= 1
+                self.health -= 5
         else:
-            self.health -= 5
+            self.health -= 50
         self.health = min(max(0, self.health), 100)
 
     def update_gun(self):
@@ -360,7 +360,7 @@ class Cactus:
     def update_health(self, state):
         # state: shot = 0, hit = 1
         if state==0:
-            self.health -= 10
+            self.health -= 15
         else:
             self.health = 0
 
@@ -389,14 +389,14 @@ class Cactus:
         return [Bullet(bullet_idx=3, centerx=self.rect.centerx, centery=self.rect.centery, speed_x=speed_x, speed_y=speed_y)]
 
     def shoot(self, dinosaur):
-        if (time.time() - self.last_shoot_time) > (random.random()+0.1):
+        if (time.time() - self.last_shoot_time) > (random.random()+0.3):
             self.last_shoot_time = time.time()
             return self.get_bullet(dinosaur)
         return []
 
 class Wyvern:
     def __init__(self):
-        self.health = 60
+        self.health = 100
         self.speed = 2
         self.bullet_speed = 8
         self.direct_x = 1
